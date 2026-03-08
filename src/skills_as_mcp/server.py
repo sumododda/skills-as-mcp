@@ -135,6 +135,27 @@ def create_server(shelf_dir: str | None = None) -> FastMCP:
             raise ToolError(f"Skill '{name}' not found.")
         return f"Skill '{name}' disabled."
 
+    @server.resource("skill://index")
+    def skill_index() -> str:
+        """Index of all installed skills with descriptions."""
+        store = _get_store()
+        skills = store.list_skills(enabled_only=True)
+        if not skills:
+            return "No skills installed."
+        lines = ["# Installed Skills\n"]
+        for s in skills:
+            lines.append(f"## {s['name']}\n{s['description']}\n")
+        return "\n".join(lines)
+
+    @server.resource("skill://{name}")
+    def skill_content(name: str) -> str:
+        """Full SKILL.md content for a specific skill."""
+        store = _get_store()
+        content = store.get_content(name)
+        if content is None:
+            return f"Skill '{name}' not found."
+        return content
+
     return server
 
 
