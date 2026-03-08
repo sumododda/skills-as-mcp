@@ -3,7 +3,7 @@
 import pytest
 from fastmcp import Client
 from fastmcp.exceptions import ToolError
-from skills_as_mcp.server import create_server
+from skills_as_mcp.server import create_server, _normalize_url
 
 
 @pytest.fixture
@@ -99,6 +99,28 @@ class TestRemoveSkill:
         async with Client(server) as client:
             with pytest.raises(ToolError, match="not found"):
                 await client.call_tool("remove_skill", {"name": "nope"})
+
+
+class TestNormalizeUrl:
+    def test_github_blob_to_raw(self):
+        url = "https://github.com/anthropics/skills/blob/main/skills/pdf/SKILL.md"
+        assert _normalize_url(url) == "https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md"
+
+    def test_github_blob_with_branch(self):
+        url = "https://github.com/user/repo/blob/dev/path/to/SKILL.md"
+        assert _normalize_url(url) == "https://raw.githubusercontent.com/user/repo/dev/path/to/SKILL.md"
+
+    def test_gist_to_raw(self):
+        url = "https://gist.github.com/user/abc123"
+        assert _normalize_url(url) == "https://gist.githubusercontent.com/user/abc123/raw"
+
+    def test_raw_url_unchanged(self):
+        url = "https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md"
+        assert _normalize_url(url) == url
+
+    def test_non_github_url_unchanged(self):
+        url = "https://example.com/my-skill/SKILL.md"
+        assert _normalize_url(url) == url
 
 
 class TestEnableDisable:

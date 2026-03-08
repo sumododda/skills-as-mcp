@@ -8,10 +8,37 @@ import httpx
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
 
+import re
+
 from skills_as_mcp.parser import ParseError
 from skills_as_mcp.store import SkillStore
 
 _store: SkillStore | None = None
+
+# Patterns for normalizing GitHub URLs to raw content
+_GITHUB_BLOB_RE = re.compile(
+    r"^https?://github\.com/([^/]+)/([^/]+)/blob/(.+)$"
+)
+_GIST_RE = re.compile(
+    r"^https?://gist\.github\.com/([^/]+)/([^/]+)/?$"
+)
+
+
+def _normalize_url(url: str) -> str:
+    """Convert common GitHub URLs to their raw content equivalents."""
+    # github.com/user/repo/blob/branch/path → raw.githubusercontent.com/user/repo/branch/path
+    m = _GITHUB_BLOB_RE.match(url)
+    if m:
+        user, repo, path = m.group(1), m.group(2), m.group(3)
+        return f"https://raw.githubusercontent.com/{user}/{repo}/{path}"
+
+    # gist.github.com/user/id → gist.githubusercontent.com/user/id/raw
+    m = _GIST_RE.match(url)
+    if m:
+        user, gist_id = m.group(1), m.group(2)
+        return f"https://gist.githubusercontent.com/{user}/{gist_id}/raw"
+
+    return url
 
 
 def _get_store() -> SkillStore:
@@ -57,9 +84,10 @@ def create_server(shelf_dir: str | None = None) -> FastMCP:
 
         source_url = url
         if url and not content:
+            fetch_url = _normalize_url(url)
             try:
                 async with httpx.AsyncClient(follow_redirects=True, timeout=30) as client:
-                    resp = await client.get(url)
+                    resp = await client.get(fetch_url)
                     resp.raise_for_status()
                     content = resp.text
             except httpx.HTTPError as e:
