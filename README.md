@@ -96,6 +96,34 @@ metadata:
 Instructions the agent reads and follows...
 ```
 
+## Examples
+
+The `examples/` directory contains sample skills you can install to test the server:
+
+| Skill | Description |
+|-------|-------------|
+| `web-search` | Search the web and summarize results |
+| `code-reviewer` | Review code changes for bugs and improvements |
+| `daily-standup` | Prepare daily standup summaries from git activity |
+
+Install a sample skill from the repo:
+
+```bash
+# Start the server
+skills-as-mcp
+
+# Then from any MCP client, install a sample skill:
+install_skill(url="https://raw.githubusercontent.com/sumododda/skills-as-mcp/main/examples/web-search/SKILL.md")
+install_skill(url="https://raw.githubusercontent.com/sumododda/skills-as-mcp/main/examples/code-reviewer/SKILL.md")
+install_skill(url="https://raw.githubusercontent.com/sumododda/skills-as-mcp/main/examples/daily-standup/SKILL.md")
+```
+
+Or install from a local file:
+
+```bash
+install_skill(content=open("examples/web-search/SKILL.md").read())
+```
+
 ## Development
 
 ```bash
