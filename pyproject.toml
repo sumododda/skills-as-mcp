@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "skills-as-mcp"
-version = "0.2.0"
+version = "0.3.0"
 description = "MCP server for dynamic AI agent skill management"
 readme = "README.md"
 license = "MIT"
@@ -32,7 +32,7 @@ dev = [
 ]
 
 [project.scripts]
-skills-as-mcp = "skills_as_mcp.server:main"
+skills-as-mcp = "skills_as_mcp.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/skills_as_mcp"]
