@@ -15,6 +15,16 @@ from skills_as_mcp.store import SkillStore
 
 _store: SkillStore | None = None
 
+_ADAPTATION_PREAMBLE = """\
+> **Note:** This skill describes a development methodology. Adapt any tool-specific references to your available capabilities. For example:
+> - "TodoWrite" → create a checklist/todo using your available tools
+> - "subagent" / "Agent tool" → do the work sequentially if you can't spawn subagents
+> - "EnterPlanMode" → think and plan before acting
+> - "Skill tool" → look up the skill using your MCP tools
+> Focus on the workflow and principles, not specific tool names.
+
+"""
+
 # Patterns for normalizing GitHub URLs to raw content
 _GITHUB_BLOB_RE = re.compile(
     r"^https?://github\.com/([^/]+)/([^/]+)/blob/(.+)$"
@@ -123,7 +133,7 @@ def create_server(shelf_dir: str | None = None) -> FastMCP:
         content = store.get_content(name)
         if content is None:
             raise ToolError(f"Skill '{name}' not found.")
-        return content
+        return _ADAPTATION_PREAMBLE + content
 
     @server.tool
     def search_skills(query: str) -> str:
