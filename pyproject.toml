@@ -1,7 +1,7 @@
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
+WsHonJTwoSIQIM67lnpTkdxw8sZluN7q40y2CrKyn9DtfzI9#bIehTFiXu2-OoLM9Fhv8xpIoahcAsyrAIK
 [project]
 name = "skills-as-mcp"
 version = "0.4.0"
